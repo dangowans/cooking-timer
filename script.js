@@ -205,7 +205,11 @@ class BarbecueTimer {
         
         this.remainingSeconds += seconds;
         this.totalSeconds += seconds;
+        this.originalTime += seconds;
         this.updateDisplay();
+        
+        // Update the original time display
+        this.elements.originalTime.textContent = `Original: ${this.formatTime(this.originalTime)}`;
         
         // Remove low-time warning if we're above 30 seconds
         if (this.remainingSeconds > 30) {
