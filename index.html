@@ -60,6 +60,57 @@
                 <button id="setCustomTimer" class="custom-btn">Set Timer</button>
             </div>
 
+            <!-- Programs Section -->
+            <div class="programs-section" id="programsSection">
+                <h3>Programs</h3>
+                <div class="programs-list" id="programsList">
+                    <!-- Programs will be dynamically loaded here -->
+                </div>
+                <button id="createProgram" class="custom-btn">Create New Program</button>
+            </div>
+
+            <!-- Program Creation Modal -->
+            <div class="program-modal" id="programModal" style="display: none;">
+                <div class="program-modal-content">
+                    <div class="program-modal-header">
+                        <h2>Create Program</h2>
+                        <button class="close-btn" id="closeProgramModal">&times;</button>
+                    </div>
+                    <div class="program-modal-body">
+                        <div class="program-form">
+                            <label for="programName">Program Name:</label>
+                            <input type="text" id="programName" placeholder="e.g., Barbecue Routine">
+                            
+                            <h4>Timer Steps:</h4>
+                            <div id="programSteps">
+                                <div class="step-input">
+                                    <input type="number" min="0" max="59" placeholder="0" class="step-minutes">
+                                    <span>minutes</span>
+                                    <input type="number" min="0" max="59" placeholder="0" class="step-seconds">
+                                    <span>seconds</span>
+                                    <input type="text" placeholder="Step description (optional)" class="step-description">
+                                    <button type="button" class="remove-step" style="display: none;">&times;</button>
+                                </div>
+                            </div>
+                            <button type="button" id="addStep" class="add-step-btn">Add Step</button>
+                        </div>
+                        <div class="program-modal-footer">
+                            <button id="saveProgram" class="save-btn">Save Program</button>
+                            <button id="cancelProgram" class="cancel-btn">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Program Execution Section -->
+            <div class="program-execution" id="programExecution" style="display: none;">
+                <h3 id="programExecutionTitle">Running Program</h3>
+                <div class="program-progress">
+                    <div id="currentStep">Step 1 of 3</div>
+                    <div id="stepDescription">Preparing...</div>
+                </div>
+            </div>
+
             <!-- Alarm Section -->
             <div class="alarm-section" id="alarmSection" style="display: none;">
                 <div class="alarm-message">

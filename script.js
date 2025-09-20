@@ -10,9 +10,17 @@ class BarbecueTimer {
         this.alarmAudio = null;
         this.alarmInterval = null;
         
+        // Program-related variables
+        this.programs = [];
+        this.currentProgram = null;
+        this.currentProgramStep = 0;
+        this.isRunningProgram = false;
+        this.originalTimerComplete = null;
+        
         this.initializeElements();
         this.setupEventListeners();
         this.createAlarmSound();
+        this.loadPrograms();
     }
     
     initializeElements() {
@@ -33,7 +41,22 @@ class BarbecueTimer {
             stopTimer: document.getElementById('stopTimer'),
             dismissAlarm: document.getElementById('dismissAlarm'),
             tempGuideBtn: document.getElementById('tempGuideBtn'),
-            closeTempModal: document.getElementById('closeTempModal')
+            closeTempModal: document.getElementById('closeTempModal'),
+            // Programs elements
+            programsSection: document.getElementById('programsSection'),
+            programsList: document.getElementById('programsList'),
+            createProgram: document.getElementById('createProgram'),
+            programModal: document.getElementById('programModal'),
+            closeProgramModal: document.getElementById('closeProgramModal'),
+            programName: document.getElementById('programName'),
+            programSteps: document.getElementById('programSteps'),
+            addStep: document.getElementById('addStep'),
+            saveProgram: document.getElementById('saveProgram'),
+            cancelProgram: document.getElementById('cancelProgram'),
+            programExecution: document.getElementById('programExecution'),
+            programExecutionTitle: document.getElementById('programExecutionTitle'),
+            currentStep: document.getElementById('currentStep'),
+            stepDescription: document.getElementById('stepDescription')
         };
     }
     
@@ -99,6 +122,41 @@ class BarbecueTimer {
                     this.setCustomTimer();
                 }
             });
+        });
+        
+        // Programs event listeners
+        this.elements.createProgram.addEventListener('click', () => {
+            this.showProgramModal();
+        });
+        
+        this.elements.closeProgramModal.addEventListener('click', () => {
+            this.hideProgramModal();
+        });
+        
+        this.elements.cancelProgram.addEventListener('click', () => {
+            this.hideProgramModal();
+        });
+        
+        this.elements.saveProgram.addEventListener('click', () => {
+            this.saveProgram();
+        });
+        
+        this.elements.addStep.addEventListener('click', () => {
+            this.addProgramStep();
+        });
+        
+        // Close program modal when clicking outside
+        this.elements.programModal.addEventListener('click', (e) => {
+            if (e.target === this.elements.programModal) {
+                this.hideProgramModal();
+            }
+        });
+        
+        // Handle Escape key for program modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.elements.programModal.style.display === 'flex') {
+                this.hideProgramModal();
+            }
         });
     }
     
@@ -287,6 +345,22 @@ class BarbecueTimer {
             this.timerInterval = null;
         }
         
+        // If a program is running, stop it completely
+        if (this.isRunningProgram) {
+            this.isRunningProgram = false;
+            this.currentProgram = null;
+            this.currentProgramStep = 0;
+            if (this.originalTimerComplete) {
+                this.timerComplete = this.originalTimerComplete; // Restore original
+            }
+            
+            // Show regular sections again
+            this.elements.quickTimers.style.display = 'block';
+            this.elements.customTimer.style.display = 'block';
+            this.elements.programsSection.style.display = 'block';
+            this.elements.programExecution.style.display = 'none';
+        }
+        
         // Reset display
         this.elements.originalTime.textContent = 'Set a timer';
         this.elements.addedTime.style.display = 'none'; // Hide added time
@@ -328,6 +402,255 @@ class BarbecueTimer {
     
     hideTempModal() {
         this.elements.tempModal.style.display = 'none';
+    }
+
+    // Program Management Methods
+    loadPrograms() {
+        try {
+            const saved = localStorage.getItem('barbecue-programs');
+            this.programs = saved ? JSON.parse(saved) : [];
+            this.displayPrograms();
+        } catch (error) {
+            console.error('Error loading programs:', error);
+            this.programs = [];
+        }
+    }
+
+    savePrograms() {
+        try {
+            localStorage.setItem('barbecue-programs', JSON.stringify(this.programs));
+        } catch (error) {
+            console.error('Error saving programs:', error);
+        }
+    }
+
+    displayPrograms() {
+        const container = this.elements.programsList;
+        container.innerHTML = '';
+
+        if (this.programs.length === 0) {
+            container.innerHTML = '<p style="color: #666; font-style: italic;">No programs saved yet. Create your first program!</p>';
+            return;
+        }
+
+        this.programs.forEach((program, index) => {
+            const programElement = document.createElement('div');
+            programElement.className = 'program-item';
+            
+            const totalTime = program.steps.reduce((total, step) => {
+                return total + (step.minutes * 60) + step.seconds;
+            }, 0);
+            
+            programElement.innerHTML = `
+                <div class="program-info">
+                    <h4>${program.name}</h4>
+                    <p>${program.steps.length} steps • Total: ${this.formatTime(totalTime)}</p>
+                </div>
+                <div class="program-actions">
+                    <button class="program-btn run-program" data-index="${index}">Run</button>
+                    <button class="program-btn delete-program" data-index="${index}">Delete</button>
+                </div>
+            `;
+            
+            container.appendChild(programElement);
+        });
+
+        // Add event listeners for run and delete buttons
+        container.querySelectorAll('.run-program').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const index = parseInt(e.target.dataset.index);
+                this.runProgram(index);
+            });
+        });
+
+        container.querySelectorAll('.delete-program').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const index = parseInt(e.target.dataset.index);
+                this.deleteProgram(index);
+            });
+        });
+    }
+
+    showProgramModal() {
+        this.elements.programModal.style.display = 'flex';
+        this.elements.programName.value = '';
+        this.resetProgramSteps();
+    }
+
+    hideProgramModal() {
+        this.elements.programModal.style.display = 'none';
+    }
+
+    resetProgramSteps() {
+        this.elements.programSteps.innerHTML = `
+            <div class="step-input">
+                <input type="number" min="0" max="59" placeholder="0" class="step-minutes">
+                <span>minutes</span>
+                <input type="number" min="0" max="59" placeholder="0" class="step-seconds">
+                <span>seconds</span>
+                <input type="text" placeholder="Step description (optional)" class="step-description">
+                <button type="button" class="remove-step" style="display: none;">&times;</button>
+            </div>
+        `;
+    }
+
+    addProgramStep() {
+        const stepDiv = document.createElement('div');
+        stepDiv.className = 'step-input';
+        stepDiv.innerHTML = `
+            <input type="number" min="0" max="59" placeholder="0" class="step-minutes">
+            <span>minutes</span>
+            <input type="number" min="0" max="59" placeholder="0" class="step-seconds">
+            <span>seconds</span>
+            <input type="text" placeholder="Step description (optional)" class="step-description">
+            <button type="button" class="remove-step">&times;</button>
+        `;
+        
+        this.elements.programSteps.appendChild(stepDiv);
+        
+        // Add event listener for remove button
+        stepDiv.querySelector('.remove-step').addEventListener('click', () => {
+            stepDiv.remove();
+            this.updateRemoveButtons();
+        });
+        
+        this.updateRemoveButtons();
+    }
+
+    updateRemoveButtons() {
+        const steps = this.elements.programSteps.querySelectorAll('.step-input');
+        steps.forEach((step, index) => {
+            const removeBtn = step.querySelector('.remove-step');
+            removeBtn.style.display = steps.length > 1 ? 'flex' : 'none';
+        });
+    }
+
+    saveProgram() {
+        const name = this.elements.programName.value.trim();
+        if (!name) {
+            alert('Please enter a program name');
+            return;
+        }
+
+        const stepInputs = this.elements.programSteps.querySelectorAll('.step-input');
+        const steps = [];
+        
+        for (let stepInput of stepInputs) {
+            const minutes = parseInt(stepInput.querySelector('.step-minutes').value) || 0;
+            const seconds = parseInt(stepInput.querySelector('.step-seconds').value) || 0;
+            const description = stepInput.querySelector('.step-description').value.trim();
+            
+            if (minutes === 0 && seconds === 0) {
+                alert('Each step must have at least 1 second');
+                return;
+            }
+            
+            steps.push({
+                minutes,
+                seconds,
+                description: description || `${minutes}m ${seconds}s`
+            });
+        }
+
+        if (steps.length === 0) {
+            alert('Please add at least one step');
+            return;
+        }
+
+        const program = { name, steps };
+        this.programs.push(program);
+        this.savePrograms();
+        this.displayPrograms();
+        this.hideProgramModal();
+    }
+
+    deleteProgram(index) {
+        const program = this.programs[index];
+        if (confirm(`Delete program "${program.name}"?`)) {
+            this.programs.splice(index, 1);
+            this.savePrograms();
+            this.displayPrograms();
+        }
+    }
+
+    runProgram(index) {
+        if (this.isRunning || this.isRunningProgram) {
+            alert('A timer is already running. Stop it first.');
+            return;
+        }
+
+        this.currentProgram = this.programs[index];
+        this.currentProgramStep = 0;
+        this.isRunningProgram = true;
+        
+        // Hide other sections and show program execution
+        this.elements.quickTimers.style.display = 'none';
+        this.elements.customTimer.style.display = 'none';
+        this.elements.programsSection.style.display = 'none';
+        this.elements.programExecution.style.display = 'block';
+        
+        this.elements.programExecutionTitle.textContent = `Running: ${this.currentProgram.name}`;
+        
+        this.runNextProgramStep();
+    }
+
+    runNextProgramStep() {
+        if (this.currentProgramStep >= this.currentProgram.steps.length) {
+            this.completeProgramExecution();
+            return;
+        }
+
+        const step = this.currentProgram.steps[this.currentProgramStep];
+        const stepTime = (step.minutes * 60) + step.seconds;
+        
+        // Update program progress display
+        this.elements.currentStep.textContent = `Step ${this.currentProgramStep + 1} of ${this.currentProgram.steps.length}`;
+        this.elements.stepDescription.textContent = step.description;
+        
+        // Start the timer for this step
+        this.setTimer(stepTime);
+        
+        // Override the timer complete method to handle program flow
+        this.originalTimerComplete = this.timerComplete.bind(this);
+        this.timerComplete = () => {
+            this.stopAlarm();
+            this.showProgramStepComplete();
+        };
+    }
+
+    showProgramStepComplete() {
+        this.currentProgramStep++;
+        
+        if (this.currentProgramStep >= this.currentProgram.steps.length) {
+            this.completeProgramExecution();
+        } else {
+            // Show a brief message and continue to next step
+            const nextStep = this.currentProgram.steps[this.currentProgramStep];
+            if (confirm(`Step ${this.currentProgramStep} complete!\n\nNext step: ${nextStep.description}\n\nClick OK to continue or Cancel to stop the program.`)) {
+                this.runNextProgramStep();
+            } else {
+                this.completeProgramExecution();
+            }
+        }
+    }
+
+    completeProgramExecution() {
+        alert(`Program "${this.currentProgram.name}" completed! 🎉`);
+        
+        // Reset program state
+        this.isRunningProgram = false;
+        this.currentProgram = null;
+        this.currentProgramStep = 0;
+        this.timerComplete = this.originalTimerComplete; // Restore original
+        
+        // Show regular sections again
+        this.elements.quickTimers.style.display = 'block';
+        this.elements.customTimer.style.display = 'block';
+        this.elements.programsSection.style.display = 'block';
+        this.elements.programExecution.style.display = 'none';
+        
+        // Reset timer display
+        this.stopTimer();
     }
 }
 
