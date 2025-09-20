@@ -70,6 +70,13 @@ header p {
     margin-bottom: 15px;
 }
 
+.added-time {
+    font-size: 1em;
+    color: #4CAF50;
+    margin-bottom: 10px;
+    font-style: italic;
+}
+
 .countdown {
     font-size: 4em;
     font-weight: bold;
@@ -287,17 +294,45 @@ header p {
         font-size: 2em;
     }
     
+    /* Make timer larger on smaller screens for better visibility */
     .countdown {
-        font-size: 3em;
+        font-size: 4.5em;
     }
     
     .quick-buttons {
         grid-template-columns: repeat(3, 1fr);
     }
     
+    /* Keep custom inputs side by side on smaller screens */
     .custom-inputs {
-        flex-direction: column;
-        gap: 15px;
+        display: grid;
+        grid-template-columns: auto auto auto auto;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        grid-template-areas: 
+            "min-input min-label sec-input sec-label";
+    }
+    
+    .custom-inputs input[id="minutes"] {
+        grid-area: min-input;
+        width: 60px;
+    }
+    
+    .custom-inputs label[for="minutes"] {
+        grid-area: min-label;
+        font-size: 0.9em;
+        margin-right: 10px;
+    }
+    
+    .custom-inputs input[id="seconds"] {
+        grid-area: sec-input;
+        width: 60px;
+    }
+    
+    .custom-inputs label[for="seconds"] {
+        grid-area: sec-label;
+        font-size: 0.9em;
     }
     
     .timer-controls {

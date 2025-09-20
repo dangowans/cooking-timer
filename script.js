@@ -3,6 +3,7 @@ class BarbecueTimer {
         this.totalSeconds = 0;
         this.remainingSeconds = 0;
         this.originalTime = 0;
+        this.addedSeconds = 0;
         this.isRunning = false;
         this.isPaused = false;
         this.timerInterval = null;
@@ -17,6 +18,7 @@ class BarbecueTimer {
     initializeElements() {
         this.elements = {
             originalTime: document.getElementById('originalTime'),
+            addedTime: document.getElementById('addedTime'),
             countdown: document.getElementById('countdown'),
             quickTimers: document.getElementById('quickTimers'),
             customTimer: document.getElementById('customTimer'),
@@ -163,6 +165,7 @@ class BarbecueTimer {
         this.totalSeconds = seconds;
         this.remainingSeconds = seconds;
         this.originalTime = seconds;
+        this.addedSeconds = 0;
         
         this.updateDisplay();
         this.startTimer();
@@ -196,6 +199,7 @@ class BarbecueTimer {
         document.body.classList.add('timer-running');
         
         this.elements.originalTime.textContent = `Original: ${this.formatTime(this.originalTime)}`;
+        this.elements.addedTime.style.display = 'none'; // Hide initially
         
         this.timerInterval = setInterval(() => {
             if (!this.isPaused) {
@@ -231,11 +235,14 @@ class BarbecueTimer {
         
         this.remainingSeconds += seconds;
         this.totalSeconds += seconds;
-        this.originalTime += seconds;
+        this.addedSeconds += seconds; // Track added time separately
         this.updateDisplay();
         
-        // Update the original time display
-        this.elements.originalTime.textContent = `Original: ${this.formatTime(this.originalTime)}`;
+        // Keep original time display unchanged, show added time below
+        if (this.addedSeconds > 0) {
+            this.elements.addedTime.textContent = `Plus ${this.formatTime(this.addedSeconds)} added`;
+            this.elements.addedTime.style.display = 'block';
+        }
         
         // Remove low-time warning if we're above 30 seconds
         if (this.remainingSeconds > 30) {
@@ -282,6 +289,7 @@ class BarbecueTimer {
         
         // Reset display
         this.elements.originalTime.textContent = 'Set a timer';
+        this.elements.addedTime.style.display = 'none'; // Hide added time
         this.elements.countdown.textContent = '00:00';
         this.elements.pauseTimer.textContent = 'Pause';
         
@@ -292,6 +300,7 @@ class BarbecueTimer {
         this.remainingSeconds = 0;
         this.totalSeconds = 0;
         this.originalTime = 0;
+        this.addedSeconds = 0; // Reset added time
     }
     
     timerComplete() {
