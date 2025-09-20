@@ -11,6 +11,7 @@
         <header>
             <h1>🔥 Barbecue Timer</h1>
             <p>Perfect for flipping meat</p>
+            <button id="tempGuideBtn" class="temp-guide-btn">🌡️ Temperature Guide</button>
         </header>
 
         <main>
@@ -64,6 +65,53 @@
                     <h2>🍖 Time to flip!</h2>
                     <p>Your meat is ready!</p>
                     <button id="dismissAlarm" class="dismiss-btn">Dismiss</button>
+                </div>
+            </div>
+
+            <!-- Temperature Guide Modal -->
+            <div class="temp-modal" id="tempModal" style="display: none;">
+                <div class="temp-modal-content">
+                    <div class="temp-modal-header">
+                        <h2>🌡️ Safe Cooking Temperatures</h2>
+                        <button id="closeTempModal" class="close-btn">&times;</button>
+                    </div>
+                    <div class="temp-modal-body">
+                        <div class="temp-grid">
+                            <div class="temp-item">
+                                <h3>🐔 Chicken & Poultry</h3>
+                                <p><strong>165°F (74°C)</strong></p>
+                                <small>Breast, thighs, wings</small>
+                            </div>
+                            <div class="temp-item">
+                                <h3>🐷 Pork</h3>
+                                <p><strong>145°F (63°C)</strong></p>
+                                <small>Chops, tenderloin, roasts</small>
+                            </div>
+                            <div class="temp-item">
+                                <h3>🐄 Ground Beef</h3>
+                                <p><strong>160°F (71°C)</strong></p>
+                                <small>Burgers, meatballs</small>
+                            </div>
+                            <div class="temp-item">
+                                <h3>🥩 Beef Steaks</h3>
+                                <p><strong>145°F (63°C)</strong></p>
+                                <small>Medium-rare</small>
+                            </div>
+                            <div class="temp-item">
+                                <h3>🦆 Duck & Goose</h3>
+                                <p><strong>165°F (74°C)</strong></p>
+                                <small>Whole bird</small>
+                            </div>
+                            <div class="temp-item">
+                                <h3>🐟 Fish</h3>
+                                <p><strong>145°F (63°C)</strong></p>
+                                <small>All varieties</small>
+                            </div>
+                        </div>
+                        <div class="temp-note">
+                            <p><strong>Note:</strong> These are USDA recommended minimum safe temperatures. Use a meat thermometer for accuracy!</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>

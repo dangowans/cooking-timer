@@ -22,13 +22,16 @@ class BarbecueTimer {
             customTimer: document.getElementById('customTimer'),
             timerControls: document.getElementById('timerControls'),
             alarmSection: document.getElementById('alarmSection'),
+            tempModal: document.getElementById('tempModal'),
             minutes: document.getElementById('minutes'),
             seconds: document.getElementById('seconds'),
             setCustomTimer: document.getElementById('setCustomTimer'),
             addTime: document.getElementById('addTime'),
             pauseTimer: document.getElementById('pauseTimer'),
             stopTimer: document.getElementById('stopTimer'),
-            dismissAlarm: document.getElementById('dismissAlarm')
+            dismissAlarm: document.getElementById('dismissAlarm'),
+            tempGuideBtn: document.getElementById('tempGuideBtn'),
+            closeTempModal: document.getElementById('closeTempModal')
         };
     }
     
@@ -62,6 +65,29 @@ class BarbecueTimer {
         // Alarm dismissal
         this.elements.dismissAlarm.addEventListener('click', () => {
             this.dismissAlarm();
+        });
+        
+        // Temperature guide modal
+        this.elements.tempGuideBtn.addEventListener('click', () => {
+            this.showTempModal();
+        });
+        
+        this.elements.closeTempModal.addEventListener('click', () => {
+            this.hideTempModal();
+        });
+        
+        // Close modal when clicking outside
+        this.elements.tempModal.addEventListener('click', (e) => {
+            if (e.target === this.elements.tempModal) {
+                this.hideTempModal();
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.elements.tempModal.style.display === 'flex') {
+                this.hideTempModal();
+            }
         });
         
         // Enter key for custom timer
@@ -281,6 +307,14 @@ class BarbecueTimer {
         this.elements.alarmSection.style.display = 'none';
         this.stopAlarm();
         document.title = 'Barbecue Timer';
+    }
+    
+    showTempModal() {
+        this.elements.tempModal.style.display = 'flex';
+    }
+    
+    hideTempModal() {
+        this.elements.tempModal.style.display = 'none';
     }
 }
 
