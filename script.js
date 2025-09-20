@@ -262,6 +262,15 @@ class BarbecueTimer {
         this.timerInterval = setInterval(() => {
             if (!this.isPaused) {
                 this.remainingSeconds--;
+                
+                // Prevent negative values from being displayed
+                if (this.remainingSeconds <= 0) {
+                    this.remainingSeconds = 0;
+                    this.updateDisplay();
+                    this.timerComplete();
+                    return;
+                }
+                
                 this.updateDisplay();
                 
                 // Warning for last 30 seconds
@@ -269,10 +278,6 @@ class BarbecueTimer {
                     document.body.classList.add('low-time');
                 } else {
                     document.body.classList.remove('low-time');
-                }
-                
-                if (this.remainingSeconds <= 0) {
-                    this.timerComplete();
                 }
             }
         }, 1000);
