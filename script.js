@@ -246,6 +246,9 @@ class BarbecueTimer {
         // Clear inputs
         this.elements.minutes.value = '';
         this.elements.seconds.value = '';
+        
+        // Scroll to top to show the timer display
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     
     startTimer() {
