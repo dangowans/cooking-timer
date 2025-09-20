@@ -678,6 +678,12 @@ class BarbecueTimer {
         // Override the timer complete method to handle program flow
         this.originalTimerComplete = this.timerComplete.bind(this);
         this.timerComplete = () => {
+            // Stop the timer but keep program running
+            this.isRunning = false;
+            if (this.timerInterval) {
+                clearInterval(this.timerInterval);
+                this.timerInterval = null;
+            }
             this.stopAlarm();
             this.showProgramStepComplete();
         };
