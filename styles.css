@@ -70,6 +70,13 @@ header p {
     margin-bottom: 15px;
 }
 
+.added-time {
+    font-size: 1em;
+    color: #4CAF50;
+    margin-bottom: 10px;
+    font-style: italic;
+}
+
 .countdown {
     font-size: 4em;
     font-weight: bold;
@@ -170,6 +177,254 @@ header p {
 .custom-btn:hover {
     background: #45a049;
     transform: translateY(-2px);
+}
+
+/* Programs Section */
+.programs-section {
+    background: #1a1a1a;
+    border-radius: 20px;
+    padding: 30px 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    text-align: center;
+    border: 1px solid #333;
+}
+
+.programs-section h3 {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.programs-list {
+    margin-bottom: 20px;
+}
+
+.program-item {
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.program-info h4 {
+    color: #fff;
+    margin: 0 0 5px 0;
+}
+
+.program-info p {
+    color: #ccc;
+    margin: 0;
+    font-size: 0.9em;
+}
+
+.program-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.program-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+}
+
+.run-program {
+    background: #4CAF50;
+    color: white;
+}
+
+.run-program:hover {
+    background: #45a049;
+}
+
+.delete-program {
+    background: #f44336;
+    color: white;
+}
+
+.delete-program:hover {
+    background: #da190b;
+}
+
+/* Program Modal */
+.program-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.program-modal-content {
+    background: #1a1a1a;
+    border-radius: 15px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 2px solid #333;
+}
+
+.program-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    border-bottom: 1px solid #333;
+}
+
+.program-modal-header h2 {
+    color: #fff;
+    margin: 0;
+}
+
+.program-modal-body {
+    padding: 25px;
+}
+
+.program-form label {
+    display: block;
+    color: #fff;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.program-form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    background: #2a2a2a;
+    border: 2px solid #555;
+    border-radius: 8px;
+    color: #fff;
+    box-sizing: border-box;
+}
+
+.program-form input:focus {
+    outline: none;
+    border-color: #ff6b35;
+}
+
+.program-form h4 {
+    color: #fff;
+    margin: 20px 0 15px 0;
+}
+
+.step-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.step-input input.step-minutes,
+.step-input input.step-seconds {
+    width: 60px;
+    margin-bottom: 0;
+    flex-shrink: 0;
+}
+
+.step-input input.step-description {
+    flex: 1;
+    min-width: 200px;
+    margin-bottom: 0;
+}
+
+.step-input span {
+    color: #ccc;
+    font-size: 0.9em;
+}
+
+.remove-step {
+    background: #f44336;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-step-btn {
+    background: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.program-modal-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.save-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.cancel-btn {
+    background: #666;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    cursor: pointer;
+}
+
+/* Program Execution */
+.program-execution {
+    background: #1a1a1a;
+    border-radius: 20px;
+    padding: 30px 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    text-align: center;
+    border: 1px solid #333;
+}
+
+.program-progress {
+    margin-top: 15px;
+}
+
+.program-progress #currentStep {
+    font-size: 1.2em;
+    color: #4CAF50;
+    margin-bottom: 10px;
+}
+
+.program-progress #stepDescription {
+    font-size: 1.1em;
+    color: #ccc;
 }
 
 /* Timer Controls */
@@ -287,17 +542,45 @@ header p {
         font-size: 2em;
     }
     
+    /* Make timer larger on smaller screens for better visibility */
     .countdown {
-        font-size: 3em;
+        font-size: 4.5em;
     }
     
     .quick-buttons {
         grid-template-columns: repeat(3, 1fr);
     }
     
+    /* Keep custom inputs side by side on smaller screens */
     .custom-inputs {
-        flex-direction: column;
-        gap: 15px;
+        display: grid;
+        grid-template-columns: auto auto auto auto;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        grid-template-areas: 
+            "min-input min-label sec-input sec-label";
+    }
+    
+    .custom-inputs input[id="minutes"] {
+        grid-area: min-input;
+        width: 60px;
+    }
+    
+    .custom-inputs label[for="minutes"] {
+        grid-area: min-label;
+        font-size: 0.9em;
+        margin-right: 10px;
+    }
+    
+    .custom-inputs input[id="seconds"] {
+        grid-area: sec-input;
+        width: 60px;
+    }
+    
+    .custom-inputs label[for="seconds"] {
+        grid-area: sec-label;
+        font-size: 0.9em;
     }
     
     .timer-controls {
@@ -307,6 +590,26 @@ header p {
     
     .control-btn {
         width: 200px;
+    }
+    
+    /* Programs responsive adjustments */
+    .program-item {
+        flex-direction: column;
+        gap: 15px;
+        text-align: left;
+    }
+    
+    .program-actions {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .step-input {
+        justify-content: center;
+    }
+    
+    .step-input input.step-description {
+        min-width: 150px;
     }
 }
 
