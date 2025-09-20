@@ -65,7 +65,12 @@ class BarbecueTimer {
             programNextStepInfo: document.getElementById('programNextStepInfo'),
             nextStepDescription: document.getElementById('nextStepDescription'),
             pauseProgram: document.getElementById('pauseProgram'),
-            continueToNextStep: document.getElementById('continueToNextStep')
+            continueToNextStep: document.getElementById('continueToNextStep'),
+            // Program completion elements
+            programCompleteAlarmSection: document.getElementById('programCompleteAlarmSection'),
+            programCompleteTitle: document.getElementById('programCompleteTitle'),
+            programCompleteMessage: document.getElementById('programCompleteMessage'),
+            dismissProgramComplete: document.getElementById('dismissProgramComplete')
         };
     }
     
@@ -175,6 +180,11 @@ class BarbecueTimer {
         
         this.elements.continueToNextStep.addEventListener('click', () => {
             this.continueToNextProgramStep();
+        });
+        
+        // Program completion event listener
+        this.elements.dismissProgramComplete.addEventListener('click', () => {
+            this.dismissProgramComplete();
         });
     }
     
@@ -631,6 +641,9 @@ class BarbecueTimer {
             return;
         }
 
+        // Scroll to top of the page when starting a program
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
         this.currentProgram = this.programs[index];
         this.currentProgramStep = 0;
         this.isRunningProgram = true;
@@ -696,7 +709,18 @@ class BarbecueTimer {
     }
 
     completeProgramExecution() {
-        alert(`Program "${this.currentProgram.name}" completed! 🎉`);
+        // Show styled program completion modal instead of basic alert
+        this.elements.programCompleteTitle.textContent = `🎉 Program Complete!`;
+        this.elements.programCompleteMessage.textContent = `Congratulations! You've completed "${this.currentProgram.name}"! 🎉`;
+        
+        // Show the program completion modal
+        this.elements.programCompleteAlarmSection.style.display = 'flex';
+        
+        // Change the page title to draw attention
+        document.title = '🎉 PROGRAM COMPLETE! - Barbecue Timer';
+        
+        // Play alarm sound and vibrate
+        this.playAlarm();
         
         // Reset program state
         this.isRunningProgram = false;
@@ -751,8 +775,14 @@ class BarbecueTimer {
         this.runNextProgramStep();
     }
     
+    dismissProgramComplete() {
+        // Hide the program completion modal
+        this.elements.programCompleteAlarmSection.style.display = 'none';
+        this.stopAlarm();
+        document.title = 'Barbecue Timer';
+    }
+    
     resumeProgramExecution() {
-        // Resume the paused program
         this.isProgramPaused = false;
         
         // Hide regular sections and show program execution
