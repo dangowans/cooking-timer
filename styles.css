@@ -769,3 +769,37 @@ header p {
         padding: 15px;
     }
 }
+
+/* Program Step Completion Styles */
+.program-step-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pause-program-btn {
+    background: #FF9800;
+}
+
+.pause-program-btn:hover {
+    background: #F57C00;
+}
+
+.continue-program-btn {
+    background: #4CAF50;
+}
+
+.continue-program-btn:hover {
+    background: #388E3C;
+}
+
+/* Paused Program Styles */
+.paused-program {
+    border: 2px solid #FF9800;
+    background: rgba(255, 152, 0, 0.1);
+}
+
+.paused-program h4 {
+    color: #FF9800;
+}
