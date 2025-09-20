@@ -15,6 +15,7 @@ class BarbecueTimer {
         this.currentProgram = null;
         this.currentProgramStep = 0;
         this.isRunningProgram = false;
+        this.isProgramPaused = false;
         this.originalTimerComplete = null;
         
         this.initializeElements();
@@ -56,7 +57,15 @@ class BarbecueTimer {
             programExecution: document.getElementById('programExecution'),
             programExecutionTitle: document.getElementById('programExecutionTitle'),
             currentStep: document.getElementById('currentStep'),
-            stepDescription: document.getElementById('stepDescription')
+            stepDescription: document.getElementById('stepDescription'),
+            // Program step completion elements
+            programStepAlarmSection: document.getElementById('programStepAlarmSection'),
+            programStepTitle: document.getElementById('programStepTitle'),
+            programStepMessage: document.getElementById('programStepMessage'),
+            programNextStepInfo: document.getElementById('programNextStepInfo'),
+            nextStepDescription: document.getElementById('nextStepDescription'),
+            pauseProgram: document.getElementById('pauseProgram'),
+            continueToNextStep: document.getElementById('continueToNextStep')
         };
     }
     
@@ -157,6 +166,15 @@ class BarbecueTimer {
             if (e.key === 'Escape' && this.elements.programModal.style.display === 'flex') {
                 this.hideProgramModal();
             }
+        });
+        
+        // Program step completion event listeners
+        this.elements.pauseProgram.addEventListener('click', () => {
+            this.pauseProgramExecution();
+        });
+        
+        this.elements.continueToNextStep.addEventListener('click', () => {
+            this.continueToNextProgramStep();
         });
     }
     
@@ -427,8 +445,34 @@ class BarbecueTimer {
     displayPrograms() {
         const container = this.elements.programsList;
         container.innerHTML = '';
+        
+        // Show resume option if a program is paused
+        if (this.isProgramPaused && this.currentProgram) {
+            const resumeElement = document.createElement('div');
+            resumeElement.className = 'program-item paused-program';
+            resumeElement.innerHTML = `
+                <div class="program-info">
+                    <h4>⏸️ ${this.currentProgram.name} (Paused)</h4>
+                    <p>Step ${this.currentProgramStep + 1} of ${this.currentProgram.steps.length} • Paused</p>
+                </div>
+                <div class="program-actions">
+                    <button class="program-btn resume-program">Resume</button>
+                    <button class="program-btn stop-program">Stop Program</button>
+                </div>
+            `;
+            container.appendChild(resumeElement);
+            
+            // Add event listeners for resume and stop
+            resumeElement.querySelector('.resume-program').addEventListener('click', () => {
+                this.resumeProgramExecution();
+            });
+            
+            resumeElement.querySelector('.stop-program').addEventListener('click', () => {
+                this.completeProgramExecution();
+            });
+        }
 
-        if (this.programs.length === 0) {
+        if (this.programs.length === 0 && !this.isProgramPaused) {
             container.innerHTML = '<p style="color: #666; font-style: italic;">No programs saved yet. Create your first program!</p>';
             return;
         }
@@ -619,18 +663,27 @@ class BarbecueTimer {
     }
 
     showProgramStepComplete() {
-        this.currentProgramStep++;
-        
-        if (this.currentProgramStep >= this.currentProgram.steps.length) {
+        // Check if this was the last step before incrementing
+        if (this.currentProgramStep + 1 >= this.currentProgram.steps.length) {
+            this.currentProgramStep++;
             this.completeProgramExecution();
         } else {
-            // Show a brief message and continue to next step
-            const nextStep = this.currentProgram.steps[this.currentProgramStep];
-            if (confirm(`Step ${this.currentProgramStep} complete!\n\nNext step: ${nextStep.description}\n\nClick OK to continue or Cancel to stop the program.`)) {
-                this.runNextProgramStep();
-            } else {
-                this.completeProgramExecution();
-            }
+            // Show enhanced alarm modal for step completion
+            const nextStep = this.currentProgram.steps[this.currentProgramStep + 1];
+            
+            // Update modal content
+            this.elements.programStepTitle.textContent = `🍖 Step ${this.currentProgramStep + 1} Complete!`;
+            this.elements.programStepMessage.textContent = `Great progress! You've completed another step.`;
+            this.elements.nextStepDescription.textContent = nextStep.description || `Step ${this.currentProgramStep + 2}`;
+            
+            // Show the program step completion modal
+            this.elements.programStepAlarmSection.style.display = 'flex';
+            
+            // Change the page title to draw attention
+            document.title = '🔥 STEP COMPLETE! - Barbecue Timer';
+            
+            // Play alarm sound and vibrate
+            this.playAlarm();
         }
     }
 
@@ -639,6 +692,7 @@ class BarbecueTimer {
         
         // Reset program state
         this.isRunningProgram = false;
+        this.isProgramPaused = false;
         this.currentProgram = null;
         this.currentProgramStep = 0;
         this.timerComplete = this.originalTimerComplete; // Restore original
@@ -651,6 +705,56 @@ class BarbecueTimer {
         
         // Reset timer display
         this.stopTimer();
+    }
+    
+    pauseProgramExecution() {
+        // Hide the step completion modal
+        this.elements.programStepAlarmSection.style.display = 'none';
+        this.stopAlarm();
+        document.title = 'Barbecue Timer';
+        
+        // Increment step counter since we completed the current step
+        this.currentProgramStep++;
+        
+        // Set program as paused
+        this.isProgramPaused = true;
+        
+        // Show regular sections for user to interact with other features
+        this.elements.quickTimers.style.display = 'block';
+        this.elements.customTimer.style.display = 'block';
+        this.elements.programsSection.style.display = 'block';
+        this.elements.programExecution.style.display = 'none';
+        
+        // Reset timer display
+        this.stopTimer();
+        
+        // Add resume button to programs section (we'll need to update displayPrograms for this)
+        this.displayPrograms();
+    }
+    
+    continueToNextProgramStep() {
+        // Hide the step completion modal
+        this.elements.programStepAlarmSection.style.display = 'none';
+        this.stopAlarm();
+        document.title = 'Barbecue Timer';
+        
+        // Increment step counter and continue to next step
+        this.currentProgramStep++;
+        this.runNextProgramStep();
+    }
+    
+    resumeProgramExecution() {
+        // Resume the paused program
+        this.isProgramPaused = false;
+        
+        // Hide regular sections and show program execution
+        this.elements.quickTimers.style.display = 'none';
+        this.elements.customTimer.style.display = 'none';
+        this.elements.programsSection.style.display = 'none';
+        this.elements.programExecution.style.display = 'block';
+        
+        // Continue from where we left off
+        this.runNextProgramStep();
     }
 }
 
