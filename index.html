@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barbecue Timer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔥 Barbecue Timer</h1>
+            <p>Perfect for flipping meat</p>
+        </header>
+
+        <main>
+            <!-- Timer Display Section -->
+            <div class="timer-display" id="timerDisplay">
+                <div class="original-time" id="originalTime">Set a timer</div>
+                <div class="countdown" id="countdown">00:00</div>
+            </div>
+
+            <!-- Quick Timer Options -->
+            <div class="quick-timers" id="quickTimers">
+                <h3>Quick Options</h3>
+                <div class="quick-buttons">
+                    <button class="quick-btn" data-seconds="30">30s</button>
+                    <button class="quick-btn" data-seconds="60">1m</button>
+                    <button class="quick-btn" data-seconds="90">1m 30s</button>
+                    <button class="quick-btn" data-seconds="120">2m</button>
+                    <button class="quick-btn" data-seconds="150">2m 30s</button>
+                    <button class="quick-btn" data-seconds="180">3m</button>
+                    <button class="quick-btn" data-seconds="210">3m 30s</button>
+                    <button class="quick-btn" data-seconds="240">4m</button>
+                    <button class="quick-btn" data-seconds="270">4m 30s</button>
+                    <button class="quick-btn" data-seconds="300">5m</button>
+                    <button class="quick-btn" data-seconds="330">5m 30s</button>
+                    <button class="quick-btn" data-seconds="360">6m</button>
+                </div>
+            </div>
+
+            <!-- Custom Timer Section -->
+            <div class="custom-timer" id="customTimer">
+                <h3>Custom Time</h3>
+                <div class="custom-inputs">
+                    <input type="number" id="minutes" placeholder="0" min="0" max="59">
+                    <label for="minutes">minutes</label>
+                    <input type="number" id="seconds" placeholder="0" min="0" max="59">
+                    <label for="seconds">seconds</label>
+                </div>
+                <button id="setCustomTimer" class="custom-btn">Set Timer</button>
+            </div>
+
+            <!-- Timer Controls -->
+            <div class="timer-controls" id="timerControls" style="display: none;">
+                <button id="addTime" class="control-btn add-btn">+30s</button>
+                <button id="pauseTimer" class="control-btn pause-btn">Pause</button>
+                <button id="stopTimer" class="control-btn stop-btn">Stop</button>
+            </div>
+
+            <!-- Alarm Section -->
+            <div class="alarm-section" id="alarmSection" style="display: none;">
+                <div class="alarm-message">
+                    <h2>🍖 Time to flip!</h2>
+                    <p>Your meat is ready!</p>
+                    <button id="dismissAlarm" class="dismiss-btn">Dismiss</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
