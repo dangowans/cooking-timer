@@ -78,6 +78,7 @@ class BarbecueTimer {
         // Quick timer buttons
         document.querySelectorAll('.quick-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                this.playButtonBeep();
                 const seconds = parseInt(e.target.dataset.seconds);
                 this.setTimer(seconds);
             });
@@ -85,33 +86,40 @@ class BarbecueTimer {
         
         // Custom timer
         this.elements.setCustomTimer.addEventListener('click', () => {
+            this.playButtonBeep();
             this.setCustomTimer();
         });
         
         // Timer controls
         this.elements.addTime.addEventListener('click', () => {
+            this.playButtonBeep();
             this.addTime(30);
         });
         
         this.elements.pauseTimer.addEventListener('click', () => {
+            this.playButtonBeep();
             this.togglePause();
         });
         
         this.elements.stopTimer.addEventListener('click', () => {
+            this.playButtonBeep();
             this.stopTimer();
         });
         
         // Alarm dismissal
         this.elements.dismissAlarm.addEventListener('click', () => {
+            this.playButtonBeep();
             this.dismissAlarm();
         });
         
         // Temperature guide modal
         this.elements.tempGuideBtn.addEventListener('click', () => {
+            this.playButtonBeep();
             this.showTempModal();
         });
         
         this.elements.closeTempModal.addEventListener('click', () => {
+            this.playButtonBeep();
             this.hideTempModal();
         });
         
@@ -133,6 +141,7 @@ class BarbecueTimer {
         [this.elements.minutes, this.elements.seconds].forEach(input => {
             input.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
+                    this.playButtonBeep();
                     this.setCustomTimer();
                 }
             });
@@ -140,22 +149,27 @@ class BarbecueTimer {
         
         // Programs event listeners
         this.elements.createProgram.addEventListener('click', () => {
+            this.playButtonBeep();
             this.showProgramModal();
         });
         
         this.elements.closeProgramModal.addEventListener('click', () => {
+            this.playButtonBeep();
             this.hideProgramModal();
         });
         
         this.elements.cancelProgram.addEventListener('click', () => {
+            this.playButtonBeep();
             this.hideProgramModal();
         });
         
         this.elements.saveProgram.addEventListener('click', () => {
+            this.playButtonBeep();
             this.saveProgram();
         });
         
         this.elements.addStep.addEventListener('click', () => {
+            this.playButtonBeep();
             this.addProgramStep();
         });
         
@@ -175,15 +189,18 @@ class BarbecueTimer {
         
         // Program step completion event listeners
         this.elements.pauseProgram.addEventListener('click', () => {
+            this.playButtonBeep();
             this.pauseProgramExecution();
         });
         
         this.elements.continueToNextStep.addEventListener('click', () => {
+            this.playButtonBeep();
             this.continueToNextProgramStep();
         });
         
         // Program completion event listener
         this.elements.dismissProgramComplete.addEventListener('click', () => {
+            this.playButtonBeep();
             this.dismissProgramComplete();
         });
     }
@@ -206,6 +223,25 @@ class BarbecueTimer {
         
         this.alarmOscillator = oscillator;
         this.alarmGain = gainNode;
+    }
+    
+    playButtonBeep() {
+        // Play a short beep sound for button clicks
+        if (!this.audioContext) return;
+        
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        
+        // Shorter, higher pitched beep for button clicks
+        oscillator.frequency.setValueAtTime(1000, this.audioContext.currentTime);
+        gainNode.gain.setValueAtTime(0.05, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.1);
+        
+        oscillator.start();
+        oscillator.stop(this.audioContext.currentTime + 0.1);
     }
     
     playAlarm() {
@@ -482,10 +518,12 @@ class BarbecueTimer {
             
             // Add event listeners for resume and stop
             resumeElement.querySelector('.resume-program').addEventListener('click', () => {
+                this.playButtonBeep();
                 this.resumeProgramExecution();
             });
             
             resumeElement.querySelector('.stop-program').addEventListener('click', () => {
+                this.playButtonBeep();
                 this.completeProgramExecution();
             });
         }
@@ -520,6 +558,7 @@ class BarbecueTimer {
         // Add event listeners for run and delete buttons
         container.querySelectorAll('.run-program').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                this.playButtonBeep();
                 const index = parseInt(e.target.dataset.index);
                 this.runProgram(index);
             });
@@ -527,6 +566,7 @@ class BarbecueTimer {
 
         container.querySelectorAll('.delete-program').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                this.playButtonBeep();
                 const index = parseInt(e.target.dataset.index);
                 this.deleteProgram(index);
             });
@@ -572,6 +612,7 @@ class BarbecueTimer {
         
         // Add event listener for remove button
         stepDiv.querySelector('.remove-step').addEventListener('click', () => {
+            this.playButtonBeep();
             stepDiv.remove();
             this.updateRemoveButtons();
         });
