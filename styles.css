@@ -48,6 +48,50 @@ header p {
     margin-top: 10px;
 }
 
+/* Volume Warning */
+.volume-warning {
+    background: linear-gradient(135deg, #FF9800, #F57C00);
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+    border: 2px solid #F57C00;
+    animation: slideDown 0.5s ease-out;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.volume-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 152, 0, 0.4);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.volume-warning .warning-icon {
+    font-size: 1.5em;
+    flex-shrink: 0;
+}
+
+.volume-warning .warning-text {
+    color: #fff;
+    font-weight: bold;
+    font-size: 1em;
+    line-height: 1.4;
+}
+
 .temp-guide-btn:hover {
     background: #45a049;
     transform: translateY(-2px);
