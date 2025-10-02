@@ -43,6 +43,7 @@ class BarbecueTimer {
             dismissAlarm: document.getElementById('dismissAlarm'),
             tempGuideBtn: document.getElementById('tempGuideBtn'),
             closeTempModal: document.getElementById('closeTempModal'),
+            volumeWarning: document.getElementById('volumeWarning'),
             // Programs elements
             programsSection: document.getElementById('programsSection'),
             programsList: document.getElementById('programsList'),
@@ -137,6 +138,11 @@ class BarbecueTimer {
             }
         });
         
+        // Volume warning click to dismiss
+        this.elements.volumeWarning.addEventListener('click', () => {
+            this.hideVolumeWarning();
+        });
+        
         // Enter key for custom timer
         [this.elements.minutes, this.elements.seconds].forEach(input => {
             input.addEventListener('keypress', (e) => {
@@ -209,6 +215,52 @@ class BarbecueTimer {
         // Create alarm sound using Web Audio API
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
         this.createBeepSound();
+        this.checkVolumeLevel();
+    }
+    
+    async checkVolumeLevel() {
+        // Check if we can detect volume level
+        // Note: Web browsers don't provide direct access to system volume
+        // We'll use a heuristic approach by checking if audio output is available
+        try {
+            if (this.audioContext) {
+                // Check if audio context is working
+                const destination = this.audioContext.destination;
+                
+                // If destination maxChannelCount is 0, audio might be unavailable
+                if (destination.maxChannelCount === 0) {
+                    this.showVolumeWarning();
+                    return;
+                }
+            }
+            
+            // Always show the warning when timer starts to remind users to check volume
+            // This is a best practice since we can't detect actual system volume
+            this.volumeWarningDismissed = false;
+        } catch (error) {
+            console.log('Could not check volume level:', error);
+        }
+    }
+    
+    showVolumeWarning() {
+        if (!this.volumeWarningDismissed && this.elements.volumeWarning) {
+            this.elements.volumeWarning.style.display = 'flex';
+            
+            // Auto-hide after 10 seconds
+            if (this.volumeWarningTimeout) {
+                clearTimeout(this.volumeWarningTimeout);
+            }
+            this.volumeWarningTimeout = setTimeout(() => {
+                this.hideVolumeWarning();
+            }, 10000);
+        }
+    }
+    
+    hideVolumeWarning() {
+        if (this.elements.volumeWarning) {
+            this.elements.volumeWarning.style.display = 'none';
+            this.volumeWarningDismissed = true;
+        }
     }
     
     createBeepSound() {
@@ -319,6 +371,9 @@ class BarbecueTimer {
         this.isRunning = true;
         this.isPaused = false;
         
+        // Show volume warning
+        this.showVolumeWarning();
+        
         // Show controls, hide setup
         this.elements.timerControls.style.display = 'flex';
         document.body.classList.add('timer-running');
@@ -411,6 +466,9 @@ class BarbecueTimer {
     stopTimer() {
         this.isRunning = false;
         this.isPaused = false;
+        
+        // Hide volume warning
+        this.hideVolumeWarning();
         
         if (this.timerInterval) {
             clearInterval(this.timerInterval);
