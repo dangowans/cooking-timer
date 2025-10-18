@@ -9,6 +9,8 @@ A responsive web app timer specifically designed for flipping meat while barbecu
 - **Timer Controls**: Add 30 seconds, pause/resume, and stop functionality
 - **Audio & Vibration Alerts**: Plays chime and vibrates (on mobile) when timer expires
 - **Visual Feedback**: Timer changes color during countdown and flashes when time is low
+- **Screen Lock Compatible**: Timer continues accurately even when phone screen is off or locked
+- **Background Notifications**: Receive notifications when timer completes, even in the background
 - **Mobile Optimized**: Responsive design that works perfectly on phones and tablets
 
 ## How to Use
@@ -33,9 +35,12 @@ Click any of the preset buttons (30s, 1m, 1m 30s, etc.) to instantly start a tim
 
 ## Technical Features
 
+- **Timestamp-Based Timer**: Uses accurate timestamp calculations to ensure timer continues correctly even when screen is off
+- **Page Visibility API**: Automatically recalculates remaining time when page becomes visible again
 - **Web Audio API**: For alarm sounds
 - **Vibration API**: For mobile device vibration
 - **Wake Lock API**: Prevents screen from sleeping during timer (where supported)
+- **Web Notifications API**: Sends notifications when timer completes in the background
 - **Responsive Design**: Works on desktop, tablet, and mobile
 - **No Dependencies**: Pure HTML, CSS, and JavaScript
 
