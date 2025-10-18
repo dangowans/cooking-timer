@@ -10,6 +10,10 @@ class BarbecueTimer {
         this.alarmAudio = null;
         this.alarmInterval = null;
         
+        // Timestamp-based timer tracking
+        this.timerEndTime = null;
+        this.pausedTime = null;
+        
         // Program-related variables
         this.programs = [];
         this.currentProgram = null;
@@ -20,6 +24,7 @@ class BarbecueTimer {
         
         this.initializeElements();
         this.setupEventListeners();
+        this.setupVisibilityHandling();
         this.createAlarmSound();
         this.loadPrograms();
     }
@@ -211,6 +216,47 @@ class BarbecueTimer {
         });
     }
     
+    setupVisibilityHandling() {
+        // Handle page visibility changes to recalculate timer when screen turns back on
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && this.isRunning && !this.isPaused) {
+                // Page became visible again, recalculate remaining time
+                this.recalculateRemainingTime();
+            }
+        });
+        
+        // Also handle when the page gains focus
+        window.addEventListener('focus', () => {
+            if (this.isRunning && !this.isPaused) {
+                this.recalculateRemainingTime();
+            }
+        });
+    }
+    
+    recalculateRemainingTime() {
+        if (!this.timerEndTime) return;
+        
+        const now = Date.now();
+        const remaining = Math.max(0, Math.ceil((this.timerEndTime - now) / 1000));
+        
+        if (remaining <= 0) {
+            // Timer has completed while we were away
+            this.remainingSeconds = 0;
+            this.updateDisplay();
+            this.timerComplete();
+        } else {
+            this.remainingSeconds = remaining;
+            this.updateDisplay();
+            
+            // Update low-time warning
+            if (this.remainingSeconds <= 30) {
+                document.body.classList.add('low-time');
+            } else {
+                document.body.classList.remove('low-time');
+            }
+        }
+    }
+    
     createAlarmSound() {
         // Create alarm sound using Web Audio API
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -371,6 +417,9 @@ class BarbecueTimer {
         this.isRunning = true;
         this.isPaused = false;
         
+        // Calculate the end time based on remaining seconds
+        this.timerEndTime = Date.now() + (this.remainingSeconds * 1000);
+        
         // Show volume warning
         this.showVolumeWarning();
         
@@ -383,7 +432,11 @@ class BarbecueTimer {
         
         this.timerInterval = setInterval(() => {
             if (!this.isPaused) {
-                this.remainingSeconds--;
+                // Calculate remaining time based on actual elapsed time
+                const now = Date.now();
+                const remaining = Math.max(0, Math.ceil((this.timerEndTime - now) / 1000));
+                
+                this.remainingSeconds = remaining;
                 
                 // Prevent negative values from being displayed
                 if (this.remainingSeconds <= 0) {
@@ -421,6 +474,12 @@ class BarbecueTimer {
         this.remainingSeconds += seconds;
         this.totalSeconds += seconds;
         this.addedSeconds += seconds; // Track added time separately
+        
+        // Update the end time to reflect added seconds
+        if (this.timerEndTime) {
+            this.timerEndTime += (seconds * 1000);
+        }
+        
         this.updateDisplay();
         
         // Keep original time display unchanged, show added time below
@@ -457,8 +516,16 @@ class BarbecueTimer {
         this.elements.pauseTimer.textContent = this.isPaused ? 'Resume' : 'Pause';
         
         if (this.isPaused) {
+            // Store the paused time
+            this.pausedTime = Date.now();
             document.body.classList.remove('timer-running');
         } else {
+            // Resume: adjust end time to account for pause duration
+            if (this.pausedTime && this.timerEndTime) {
+                const pauseDuration = Date.now() - this.pausedTime;
+                this.timerEndTime += pauseDuration;
+                this.pausedTime = null;
+            }
             document.body.classList.add('timer-running');
         }
     }
@@ -466,6 +533,10 @@ class BarbecueTimer {
     stopTimer() {
         this.isRunning = false;
         this.isPaused = false;
+        
+        // Reset timestamp tracking
+        this.timerEndTime = null;
+        this.pausedTime = null;
         
         // Hide volume warning
         this.hideVolumeWarning();
@@ -511,6 +582,18 @@ class BarbecueTimer {
         this.stopTimer();
         this.showAlarm();
         this.playAlarm();
+        
+        // Send notification if the page is in the background
+        if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
+            new Notification('🍖 Time to flip!', {
+                body: 'Your Barbecue Timer has finished!',
+                icon: '/android-chrome-192x192.png',
+                badge: '/favicon-48x48.png',
+                vibrate: [500, 200, 500, 200, 500],
+                tag: 'timer-complete',
+                requireInteraction: true
+            });
+        }
     }
     
     showAlarm() {
@@ -810,6 +893,18 @@ class BarbecueTimer {
             
             // Play alarm sound and vibrate
             this.playAlarm();
+            
+            // Send notification if the page is in the background
+            if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
+                new Notification(`🍖 Step ${this.currentProgramStep + 1} Complete!`, {
+                    body: `Next: ${nextStep.description || `Step ${this.currentProgramStep + 2}`}`,
+                    icon: '/android-chrome-192x192.png',
+                    badge: '/favicon-48x48.png',
+                    vibrate: [500, 200, 500, 200, 500],
+                    tag: 'program-step-complete',
+                    requireInteraction: true
+                });
+            }
         }
     }
 
@@ -826,6 +921,18 @@ class BarbecueTimer {
         
         // Play alarm sound and vibrate
         this.playAlarm();
+        
+        // Send notification if the page is in the background
+        if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
+            new Notification('🎉 Program Complete!', {
+                body: `You've finished "${this.currentProgram.name}"!`,
+                icon: '/android-chrome-192x192.png',
+                badge: '/favicon-48x48.png',
+                vibrate: [500, 200, 500, 200, 500],
+                tag: 'program-complete',
+                requireInteraction: true
+            });
+        }
         
         // Reset program state
         this.isRunningProgram = false;
@@ -908,7 +1015,9 @@ document.addEventListener('DOMContentLoaded', () => {
         Notification.requestPermission();
     }
     
-    new BarbecueTimer();
+    const timer = new BarbecueTimer();
+    // Expose for testing purposes
+    window.barbecueTimerInstance = timer;
 });
 
 // Service Worker registration for better mobile experience
@@ -918,24 +1027,62 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-// Prevent page from sleeping during timer
+// Wake Lock API to prevent screen from sleeping during timer
 let wakeLock = null;
 
 async function requestWakeLock() {
     if ('wakeLock' in navigator) {
         try {
             wakeLock = await navigator.wakeLock.request('screen');
+            console.log('Wake Lock acquired');
+            
+            // Re-acquire wake lock when it's released (e.g., screen turns off and on)
+            wakeLock.addEventListener('release', () => {
+                console.log('Wake Lock released');
+            });
         } catch (err) {
-            // Wake lock not supported or denied
+            console.error('Wake Lock error:', err);
         }
     }
 }
 
-// Request wake lock when timer starts
+async function releaseWakeLock() {
+    if (wakeLock !== null) {
+        try {
+            await wakeLock.release();
+            wakeLock = null;
+            console.log('Wake Lock manually released');
+        } catch (err) {
+            console.error('Wake Lock release error:', err);
+        }
+    }
+}
+
+// Integrate wake lock with timer lifecycle
 document.addEventListener('DOMContentLoaded', () => {
+    // Store references to original methods
     const originalStartTimer = BarbecueTimer.prototype.startTimer;
+    const originalStopTimer = BarbecueTimer.prototype.stopTimer;
+    
+    // Override startTimer to request wake lock
     BarbecueTimer.prototype.startTimer = function() {
         originalStartTimer.call(this);
         requestWakeLock();
     };
+    
+    // Override stopTimer to release wake lock
+    BarbecueTimer.prototype.stopTimer = function() {
+        originalStopTimer.call(this);
+        releaseWakeLock();
+    };
+    
+    // Re-request wake lock when page becomes visible again
+    document.addEventListener('visibilitychange', async () => {
+        if (!document.hidden && wakeLock === null) {
+            // Check if timer is running by looking at body class
+            if (document.body.classList.contains('timer-running')) {
+                await requestWakeLock();
+            }
+        }
+    });
 });
