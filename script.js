@@ -582,6 +582,18 @@ class BarbecueTimer {
         this.stopTimer();
         this.showAlarm();
         this.playAlarm();
+        
+        // Send notification if the page is in the background
+        if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
+            new Notification('🍖 Time to flip!', {
+                body: 'Your Barbecue Timer has finished!',
+                icon: '/android-chrome-192x192.png',
+                badge: '/favicon-48x48.png',
+                vibrate: [500, 200, 500, 200, 500],
+                tag: 'timer-complete',
+                requireInteraction: true
+            });
+        }
     }
     
     showAlarm() {
@@ -881,6 +893,18 @@ class BarbecueTimer {
             
             // Play alarm sound and vibrate
             this.playAlarm();
+            
+            // Send notification if the page is in the background
+            if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
+                new Notification(`🍖 Step ${this.currentProgramStep + 1} Complete!`, {
+                    body: `Next: ${nextStep.description || `Step ${this.currentProgramStep + 2}`}`,
+                    icon: '/android-chrome-192x192.png',
+                    badge: '/favicon-48x48.png',
+                    vibrate: [500, 200, 500, 200, 500],
+                    tag: 'program-step-complete',
+                    requireInteraction: true
+                });
+            }
         }
     }
 
@@ -897,6 +921,18 @@ class BarbecueTimer {
         
         // Play alarm sound and vibrate
         this.playAlarm();
+        
+        // Send notification if the page is in the background
+        if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
+            new Notification('🎉 Program Complete!', {
+                body: `You've finished "${this.currentProgram.name}"!`,
+                icon: '/android-chrome-192x192.png',
+                badge: '/favicon-48x48.png',
+                vibrate: [500, 200, 500, 200, 500],
+                tag: 'program-complete',
+                requireInteraction: true
+            });
+        }
         
         // Reset program state
         this.isRunningProgram = false;
@@ -979,7 +1015,9 @@ document.addEventListener('DOMContentLoaded', () => {
         Notification.requestPermission();
     }
     
-    new BarbecueTimer();
+    const timer = new BarbecueTimer();
+    // Expose for testing purposes
+    window.barbecueTimerInstance = timer;
 });
 
 // Service Worker registration for better mobile experience
