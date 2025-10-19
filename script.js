@@ -1039,6 +1039,7 @@ async function requestWakeLock() {
             // Re-acquire wake lock when it's released (e.g., screen turns off and on)
             wakeLock.addEventListener('release', () => {
                 console.log('Wake Lock released');
+                wakeLock = null;
             });
         } catch (err) {
             console.error('Wake Lock error:', err);
