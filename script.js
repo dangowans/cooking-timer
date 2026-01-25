@@ -420,9 +420,7 @@ class BarbecueTimer {
         this.isPaused = false;
         
         // Clear any previous last-used highlight
-        document.querySelectorAll('.quick-btn').forEach(btn => {
-            btn.classList.remove('last-used');
-        });
+        this.clearLastUsedHighlight();
         
         // Calculate the end time based on remaining seconds
         this.timerEndTime = Date.now() + (this.remainingSeconds * 1000);
@@ -617,11 +615,14 @@ class BarbecueTimer {
         this.highlightLastUsedTime();
     }
     
-    highlightLastUsedTime() {
-        // Clear any existing highlights
+    clearLastUsedHighlight() {
         document.querySelectorAll('.quick-btn').forEach(btn => {
             btn.classList.remove('last-used');
         });
+    }
+    
+    highlightLastUsedTime() {
+        this.clearLastUsedHighlight();
         
         // Highlight the matching quick button if there is one
         if (this.lastUsedTime !== null) {
