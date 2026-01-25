@@ -163,10 +163,29 @@ header p {
     transition: all 0.3s ease;
 }
 
+.quick-btn.last-used {
+    background: #4CAF50;
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
+    animation: pulse-highlight 2s ease-in-out infinite;
+}
+
+@keyframes pulse-highlight {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(76, 175, 80, 0.9);
+    }
+}
+
 .quick-btn:hover {
     background: #e55a2e;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.quick-btn.last-used:hover {
+    background: #45a049;
 }
 
 .quick-btn:active {

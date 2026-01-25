@@ -9,6 +9,7 @@ class BarbecueTimer {
         this.timerInterval = null;
         this.alarmAudio = null;
         this.alarmInterval = null;
+        this.lastUsedTime = null;
         
         // Timestamp-based timer tracking
         this.timerEndTime = null;
@@ -386,6 +387,7 @@ class BarbecueTimer {
         this.remainingSeconds = seconds;
         this.originalTime = seconds;
         this.addedSeconds = 0;
+        this.lastUsedTime = seconds;
         
         this.updateDisplay();
         this.startTimer();
@@ -416,6 +418,11 @@ class BarbecueTimer {
     startTimer() {
         this.isRunning = true;
         this.isPaused = false;
+        
+        // Clear any previous last-used highlight
+        document.querySelectorAll('.quick-btn').forEach(btn => {
+            btn.classList.remove('last-used');
+        });
         
         // Calculate the end time based on remaining seconds
         this.timerEndTime = Date.now() + (this.remainingSeconds * 1000);
@@ -607,6 +614,22 @@ class BarbecueTimer {
         this.elements.alarmSection.style.display = 'none';
         this.stopAlarm();
         document.title = 'Barbecue Timer';
+        this.highlightLastUsedTime();
+    }
+    
+    highlightLastUsedTime() {
+        // Clear any existing highlights
+        document.querySelectorAll('.quick-btn').forEach(btn => {
+            btn.classList.remove('last-used');
+        });
+        
+        // Highlight the matching quick button if there is one
+        if (this.lastUsedTime !== null) {
+            const matchingButton = document.querySelector(`.quick-btn[data-seconds="${this.lastUsedTime}"]`);
+            if (matchingButton) {
+                matchingButton.classList.add('last-used');
+            }
+        }
     }
     
     showTempModal() {
