@@ -10,6 +10,7 @@ class BarbecueTimer {
         this.alarmAudio = null;
         this.alarmInterval = null;
         this.lastUsedTime = null;
+        this.lastCountdownCueSecond = null;
         
         // Timestamp-based timer tracking
         this.timerEndTime = null;
@@ -342,6 +343,46 @@ class BarbecueTimer {
         oscillator.start();
         oscillator.stop(this.audioContext.currentTime + 0.1);
     }
+
+    playCountdownBeep() {
+        if (!this.audioContext) return;
+
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+
+        oscillator.frequency.setValueAtTime(1200, this.audioContext.currentTime);
+        gainNode.gain.setValueAtTime(0.08, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.12);
+
+        oscillator.start();
+        oscillator.stop(this.audioContext.currentTime + 0.12);
+    }
+
+    playCountdownCues(remainingSeconds) {
+        if (remainingSeconds <= 0) {
+            this.lastCountdownCueSecond = null;
+            return;
+        }
+
+        if (this.lastCountdownCueSecond === remainingSeconds) {
+            return;
+        }
+
+        const startSecond = this.lastCountdownCueSecond === null
+            ? remainingSeconds + 1
+            : this.lastCountdownCueSecond - 1;
+
+        for (let second = startSecond; second >= remainingSeconds; second--) {
+            if (second === 30 || (second <= 10 && second > 0)) {
+                this.playCountdownBeep();
+            }
+        }
+
+        this.lastCountdownCueSecond = remainingSeconds;
+    }
     
     playAlarm() {
         let isPlaying = true;
@@ -388,6 +429,7 @@ class BarbecueTimer {
         this.originalTime = seconds;
         this.addedSeconds = 0;
         this.lastUsedTime = seconds;
+        this.lastCountdownCueSecond = null;
         
         this.updateDisplay();
         this.startTimer();
@@ -442,6 +484,7 @@ class BarbecueTimer {
                 const remaining = Math.max(0, Math.ceil((this.timerEndTime - now) / 1000));
                 
                 this.remainingSeconds = remaining;
+                this.playCountdownCues(this.remainingSeconds);
                 
                 // Prevent negative values from being displayed
                 if (this.remainingSeconds <= 0) {
@@ -538,6 +581,7 @@ class BarbecueTimer {
     stopTimer() {
         this.isRunning = false;
         this.isPaused = false;
+        this.lastCountdownCueSecond = null;
         
         // Reset timestamp tracking
         this.timerEndTime = null;
