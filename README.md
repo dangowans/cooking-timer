@@ -7,7 +7,7 @@ A responsive web app timer specifically designed for flipping meat while barbecu
 - **Custom Timer**: Set any custom time with minutes and seconds
 - **Live Countdown**: Large, clear countdown display with original timer amount always visible
 - **Timer Controls**: Add 30 seconds, pause/resume, and stop functionality
-- **Audio & Vibration Alerts**: Plays chime and vibrates (on mobile) when timer expires
+- **Audio & Vibration Alerts**: Plays an ongoing buzzer and vibrates (on mobile) when timer expires
 - **Countdown Audio Cues**: Beeps once at 30 seconds remaining, then every second for the final 10 seconds
 - **Visual Feedback**: Timer changes color during countdown and flashes when time is low
 - **Screen Lock Compatible**: Timer continues accurately even when phone screen is off or locked
@@ -30,7 +30,7 @@ Click any of the preset buttons (30s, 1m, 1m 30s, etc.) to instantly start a tim
 
 ### When Timer Expires
 - A modal will appear with "🍖 Time to flip!" message
-- Audio chime will play continuously
+- Ongoing buzzer will play continuously
 - Device will vibrate (on supported mobile devices)
 - Click "Dismiss" to stop the alarm
 
