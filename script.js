@@ -9,6 +9,9 @@ class BarbecueTimer {
         this.timerInterval = null;
         this.alarmAudio = null;
         this.alarmInterval = null;
+        this.vibrationInterval = null;
+        this.buzzerOscillator = null;
+        this.buzzerGain = null;
         this.lastUsedTime = null;
         this.lastCountdownCueSecond = null;
         
@@ -385,35 +388,73 @@ class BarbecueTimer {
     }
     
     playAlarm() {
-        let isPlaying = true;
-        
+        if (!this.audioContext) return;
+
+        this.stopAlarm();
+
+        if (this.audioContext.state === 'suspended') {
+            this.audioContext.resume().catch(() => {
+                // Ignore resume errors and continue silently
+            });
+        }
+
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+
+        oscillator.type = 'square';
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+
+        oscillator.frequency.setValueAtTime(190, this.audioContext.currentTime);
+        gainNode.gain.setValueAtTime(0.0001, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.12, this.audioContext.currentTime + 0.05);
+
+        oscillator.start();
+
+        this.buzzerOscillator = oscillator;
+        this.buzzerGain = gainNode;
+
+        let highTone = false;
         this.alarmInterval = setInterval(() => {
-            if (isPlaying) {
-                const oscillator = this.audioContext.createOscillator();
-                const gainNode = this.audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(this.audioContext.destination);
-                
-                oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
-                gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.5);
-                
-                oscillator.start();
-                oscillator.stop(this.audioContext.currentTime + 0.5);
-                
-                // Vibrate if supported
-                if ('vibrate' in navigator) {
-                    navigator.vibrate([500, 200, 500, 200, 500]);
-                }
-            }
-        }, 1000);
+            if (!this.buzzerOscillator) return;
+
+            highTone = !highTone;
+            const nextFrequency = highTone ? 220 : 170;
+            this.buzzerOscillator.frequency.setValueAtTime(nextFrequency, this.audioContext.currentTime);
+        }, 150);
+
+        if ('vibrate' in navigator) {
+            navigator.vibrate([500, 150, 500]);
+            this.vibrationInterval = setInterval(() => {
+                navigator.vibrate([500, 150, 500]);
+            }, 1200);
+        }
     }
     
     stopAlarm() {
         if (this.alarmInterval) {
             clearInterval(this.alarmInterval);
             this.alarmInterval = null;
+        }
+
+        if (this.vibrationInterval) {
+            clearInterval(this.vibrationInterval);
+            this.vibrationInterval = null;
+        }
+
+        if (this.buzzerOscillator) {
+            try {
+                this.buzzerOscillator.stop();
+            } catch (_) {
+                // Oscillator may already be stopped
+            }
+            this.buzzerOscillator.disconnect();
+            this.buzzerOscillator = null;
+        }
+
+        if (this.buzzerGain) {
+            this.buzzerGain.disconnect();
+            this.buzzerGain = null;
         }
         
         if ('vibrate' in navigator) {
